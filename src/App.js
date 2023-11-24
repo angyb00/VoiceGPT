@@ -1,11 +1,12 @@
 import './App.css';
+import { Button } from 'react-bootstrap';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        Hello World
-      </header>
+      <section>
+        <h1 className='App-header'>VoiceGPT</h1>
+      </section>
     </div>
   );
 }
