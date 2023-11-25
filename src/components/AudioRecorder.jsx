@@ -64,16 +64,27 @@ export default function AudioRecorder() {
         <div>
             <h2>Audio Recorder</h2>
             <div>
-                { !permission && (
+                { !permission &&  (
                             <Button onClick={getMicrophonePermission}>
                                 Get Microphone
                             </Button>
                         ) }
-                { permission && (
-                    <Button>
-                        Record
+                { permission && recordingStatus === "inactive" (
+                    <Button onClick={startRecording}>
+                        Start Recording
                     </Button>
                 ) }
+                { recordingStatus === "recording" && (
+                    <Button onClick={stopRecording}>
+                        Stop Recording
+                    </Button>
+                )}
+                { audio && (
+                    <div>
+                        <audio src={audio} controls></audio>
+                        <a download href={audio}>Download Recording</a>
+                    </div>
+                )}
             </div>
         </div>
     )
