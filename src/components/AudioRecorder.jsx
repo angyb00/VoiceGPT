@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { Button } from 'react-bootstrap';
+import './AudioRecorder.css';
 
 
 export default function AudioRecorder() {
@@ -69,7 +70,7 @@ export default function AudioRecorder() {
                                 Get Microphone
                             </Button>
                         ) }
-                { permission && recordingStatus === "inactive" (
+                { permission && recordingStatus === "inactive" && (
                     <Button onClick={startRecording}>
                         Start Recording
                     </Button>
@@ -78,13 +79,15 @@ export default function AudioRecorder() {
                     <Button onClick={stopRecording}>
                         Stop Recording
                     </Button>
-                )}
+                ) }
                 { audio && (
-                    <div>
+                    <div className="audio-container">
                         <audio src={audio} controls></audio>
-                        <a download href={audio}>Download Recording</a>
+                        <div>
+                            <a download href={audio}>Download Recording</a>
+                        </div>
                     </div>
-                )}
+                ) }
             </div>
         </div>
     )
