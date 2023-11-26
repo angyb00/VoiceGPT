@@ -1,7 +1,7 @@
 import './App.css';
 import AudioRecorder from './components/AudioRecorder';
 import { Button } from 'react-bootstrap';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 
@@ -9,6 +9,7 @@ import axios from 'axios';
 function App() {
 
   const [audioFile, setAudioFile] = useState(null);
+  const [audioText, setAudioText] = useState("");
 
   const uploadFileToWhisper = async () => {
     const formData = new FormData();
@@ -22,7 +23,7 @@ function App() {
       }
     })
     .then(value => {
-        console.log(value.data);
+      setAudioText(value.data.text);
     })
     .catch((error) => {
       alert("Error: ", error.response);
