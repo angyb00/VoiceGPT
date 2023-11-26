@@ -1,8 +1,35 @@
 import './App.css';
-import { Button } from 'react-bootstrap';
 import AudioRecorder from './components/AudioRecorder';
+import { Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import axios from 'axios';
+
+
 
 function App() {
+
+  const [audioFile, setAudioFile] = useState(null);
+  const [audioText, setAudioText] = useState("");
+
+  const uploadFileToWhisper = async () => {
+    const formData = new FormData();
+    formData.append('model', 'whisper-1');
+    formData.append('file', audioFile);
+
+    axios.post('https://api.openai.com/v1/audio/transcriptions', formData, {
+      headers: {
+        'Authorization': `Bearer ${process.env.REACT_APP_SECRET_KEY}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    .then(value => {
+      setAudioText(value.data.text);
+    })
+    .catch((error) => {
+      alert("Error: ", error.response);
+    })
+  };
+
   return (
     <div className="App">
       <section>
@@ -11,10 +38,17 @@ function App() {
       <div>
         <AudioRecorder/>
       </div>
-      <div className='upload-audio-button'>
-        <Button variant='secondary' size='lg'>
-          Upload audio file
-        </Button>
+      <div className='upload-audio-container'>
+        <input
+          type="file"
+          accept='.webm, .mp3, .mp4, .mpeg, mpga, .m4a, .wav'
+          onChange={ (event) => { setAudioFile(event.target.files[0]); } } 
+          />
+          { audioFile !== null && (
+            <div className='upload-file-button'>
+              <Button onClick={uploadFileToWhisper}>Upload Audio File</Button>
+            </div>
+          )}
       </div>
     </div>
   );

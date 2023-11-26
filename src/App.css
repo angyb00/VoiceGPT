@@ -8,7 +8,7 @@
   }
 }
 
-.upload-audio-button {
+.upload-audio-container {
   position: fixed;
   bottom: 0;
   margin-bottom: 50px;
@@ -16,6 +16,10 @@
   transform: translateX(-50%);
   z-index: 1000;
   width: 100%;
+}
+
+.upload-file-button {
+  margin-top: 20px;
 }
 
 .App-header {
