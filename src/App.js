@@ -5,8 +5,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import OpenAI from 'openai';
 
-
-
 function App() {
 
   const openai = new OpenAI({
@@ -14,8 +12,8 @@ function App() {
     dangerouslyAllowBrowser: true
   });
   const [audioFile, setAudioFile] = useState(null);
-  const [audioText, setAudioText] = useState("");
-  const [promptAnswer, setPromptAnswer] = useState("");
+  const [audioText, setAudioText] = useState([]);
+  const [promptAnswer, setPromptAnswer] = useState([]);
 
   const uploadFileToWhisper = async () => {
     const formData = new FormData();
@@ -29,31 +27,27 @@ function App() {
       }
     })
     .then(value => {
-      setAudioText(value.data.text);
-      // uploadPromptToChat();
+      setAudioText(prevArray => [...prevArray, value.data.text]);
     })
     .catch((error) => {
       alert("Error: ", error.response);
     })
-    uploadPromptToChat();
   };
 
   const uploadPromptToChat = async () => {
     const completion = await openai.chat.completions.create({
-      messages: [{"role": "user", "content": audioText}],
+      messages: [{"role": "user", "content": audioText[audioText.length - 1]}],
       model: "gpt-3.5-turbo"
     });
-
-    // console.log(completion.choices[0]);
-    console.log(audioText);
-    setPromptAnswer(completion.choices[0].message.content);
+    setPromptAnswer(prevArray => [...prevArray, completion.choices[0].message.content]);
   };
 
   useEffect(() => {
-    if (audioText !== "") {
-      uploadPromptToChat()
+    if (audioText.length !== 0) {
+      console.log("Reached here");
+      uploadPromptToChat();
     }
-  }, [audioText]);
+  }, [audioText.length]);
 
   return (
     <div className="App">
@@ -75,6 +69,18 @@ function App() {
             </div>
           )}
       </div>
+      {
+        audioText.map((element, index) => {
+         return (
+          <div className='chat-elements'>
+            <b>You:</b> {element}
+            <div className='chat-elements'>
+              <b>Chat:</b> {promptAnswer[index]}
+            </div>
+          </div>
+          )
+        })
+      }
     </div>
   );
 }
