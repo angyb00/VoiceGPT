@@ -1,7 +1,7 @@
 import './App.css';
 import AudioRecorder from './components/AudioRecorder';
 import { Button } from 'react-bootstrap';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import OpenAI from 'openai';
 
@@ -9,9 +9,13 @@ import OpenAI from 'openai';
 
 function App() {
 
-  const openai = new OpenAI();
+  const openai = new OpenAI({
+    apiKey: process.env.REACT_APP_SECRET_KEY,
+    dangerouslyAllowBrowser: true
+  });
   const [audioFile, setAudioFile] = useState(null);
   const [audioText, setAudioText] = useState("");
+  const [promptAnswer, setPromptAnswer] = useState("");
 
   const uploadFileToWhisper = async () => {
     const formData = new FormData();
@@ -26,21 +30,30 @@ function App() {
     })
     .then(value => {
       setAudioText(value.data.text);
+      // uploadPromptToChat();
     })
     .catch((error) => {
       alert("Error: ", error.response);
     })
+    uploadPromptToChat();
   };
 
   const uploadPromptToChat = async () => {
-    openai.chat.completions.create({
-      messages: [{"role": "user", "content": "What is 2+2?"}],
+    const completion = await openai.chat.completions.create({
+      messages: [{"role": "user", "content": audioText}],
       model: "gpt-3.5-turbo"
-    })
-    .then(res => {
-      console.log(res.data)
-    })
+    });
+
+    // console.log(completion.choices[0]);
+    console.log(audioText);
+    setPromptAnswer(completion.choices[0].message.content);
   };
+
+  useEffect(() => {
+    if (audioText !== "") {
+      uploadPromptToChat()
+    }
+  }, [audioText]);
 
   return (
     <div className="App">
@@ -58,7 +71,7 @@ function App() {
           />
           { audioFile !== null && (
             <div className='upload-file-button'>
-              <Button onClick={uploadPromptToChat}>Upload Audio File</Button>
+              <Button onClick={uploadFileToWhisper}>Upload Audio File</Button>
             </div>
           )}
       </div>
