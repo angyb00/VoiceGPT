@@ -1,15 +1,19 @@
 import './App.css';
 import AudioRecorder from './components/AudioRecorder';
 import { Button } from 'react-bootstrap';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
-
+import OpenAI from 'openai';
 
 function App() {
 
+  const openai = new OpenAI({
+    apiKey: process.env.REACT_APP_SECRET_KEY,
+    dangerouslyAllowBrowser: true
+  });
   const [audioFile, setAudioFile] = useState(null);
-  const [audioText, setAudioText] = useState("");
+  const [audioText, setAudioText] = useState([]);
+  const [promptAnswer, setPromptAnswer] = useState([]);
 
   const uploadFileToWhisper = async () => {
     const formData = new FormData();
@@ -23,12 +27,27 @@ function App() {
       }
     })
     .then(value => {
-      setAudioText(value.data.text);
+      setAudioText(prevArray => [...prevArray, value.data.text]);
     })
     .catch((error) => {
       alert("Error: ", error.response);
     })
   };
+
+  const uploadPromptToChat = async () => {
+    const completion = await openai.chat.completions.create({
+      messages: [{"role": "user", "content": audioText[audioText.length - 1]}],
+      model: "gpt-3.5-turbo"
+    });
+    setPromptAnswer(prevArray => [...prevArray, completion.choices[0].message.content]);
+  };
+
+  useEffect(() => {
+    if (audioText.length !== 0) {
+      console.log("Reached here");
+      uploadPromptToChat();
+    }
+  }, [audioText.length]);
 
   return (
     <div className="App">
@@ -50,6 +69,18 @@ function App() {
             </div>
           )}
       </div>
+      {
+        audioText.map((element, index) => {
+         return (
+          <div className='chat-elements'>
+            <b>You:</b> {element}
+            <div className='chat-elements'>
+              <b>Chat:</b> {promptAnswer[index]}
+            </div>
+          </div>
+          )
+        })
+      }
     </div>
   );
 }
