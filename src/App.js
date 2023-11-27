@@ -75,10 +75,10 @@ function App() {
          return (
           <div className='chat-container'>
             <div className='chat-elements'>
-              <b>You:</b> <Typewriter promptText={element} delay={10}/>
+              <b>You:</b> <Typewriter promptText={element} delay={30}/>
             </div>
             <div className='chat-elements'>
-              <b>Chat:</b> <Typewriter promptText={promptAnswer[index]} delay={10}/>
+              <b>Chat:</b> <Typewriter promptText={promptAnswer[index]} delay={30}/>
             </div>
           </div>
           )
