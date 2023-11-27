@@ -28,6 +28,15 @@
   margin-bottom: 20px;
 }
 
+.chat-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
 .chat-elements {
+  word-break: break-word;
+  max-width: 600px;
   margin-top: 20px;
 }

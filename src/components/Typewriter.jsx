@@ -6,7 +6,7 @@ export default function Typewriter({promptText, delay}) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
-        if (currentIndex < promptText.length) {
+        if (promptText !== undefined && currentIndex < promptText.length) {
           const timeout = setTimeout(() => {
             setCurrentText(prevText => prevText + promptText[currentIndex]);
             setCurrentIndex(prevIndex => prevIndex + 1);
@@ -14,11 +14,11 @@ export default function Typewriter({promptText, delay}) {
       
           return () => clearTimeout(timeout);
         }
-      }, [currentIndex, delay, text]);
+      }, [currentIndex, delay, promptText]);
 
     return (
-        <div>
+        <p>
             {currentText}
-        </div>
+        </p>
     );
 }

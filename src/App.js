@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import OpenAI from 'openai';
+import Typewriter from './components/Typewriter';
 
 function App() {
 
@@ -72,10 +73,12 @@ function App() {
       {
         audioText.map((element, index) => {
          return (
-          <div className='chat-elements'>
-            <b>You:</b> {element}
+          <div className='chat-container'>
             <div className='chat-elements'>
-              <b>Chat:</b> {promptAnswer[index]}
+              <b>You:</b> <Typewriter promptText={element} delay={10}/>
+            </div>
+            <div className='chat-elements'>
+              <b>Chat:</b> <Typewriter promptText={promptAnswer[index]} delay={10}/>
             </div>
           </div>
           )
