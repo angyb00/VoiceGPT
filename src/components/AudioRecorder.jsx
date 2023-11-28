@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { useState, useRef } from "react";
 import { Button } from 'react-bootstrap';
 import './AudioRecorder.css';
+import axios from "axios";
 
 
 export default function AudioRecorder() {
@@ -9,6 +11,7 @@ export default function AudioRecorder() {
     const [stream, setStream] = useState(null);
     const [audioChunks, setAudioChunks] = useState([]);
     const [audio, setAudio] = useState(null);
+    const [audioBlob, setBlob] = useState(null);
     const mediaRecorder = useRef(null);
     const [recordingStatus, setRecordingStatus] = useState("inactive");
     const mimeType = "audio/webm";
@@ -30,6 +33,26 @@ export default function AudioRecorder() {
         }
     };
 
+    const uploadFileToWhisper = async () => {
+        const file = new File([audioBlob], "recordedText.webm");
+        const formData = new FormData();
+        formData.append('model', 'whisper-1');
+        formData.append('file', file);
+    
+        axios.post('https://api.openai.com/v1/audio/transcriptions', formData, {
+          headers: {
+            'Authorization': `Bearer ${process.env.REACT_APP_SECRET_KEY}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        .then(value => {
+        console.log(value.data);
+        })
+        .catch((error) => {
+          alert("Error: ", error.response);
+        })
+      };
+
     const startRecording = async () => {
         setRecordingStatus("recording");
         //create new Media recorder instance using the stream
@@ -49,17 +72,21 @@ export default function AudioRecorder() {
 
       const stopRecording = () => {
         setRecordingStatus("inactive");
-        //stops the recording instance
         mediaRecorder.current.stop();
         mediaRecorder.current.onstop = () => {
-          //creates a blob file from the audiochunks data
            const audioBlob = new Blob(audioChunks, { type: mimeType });
-          //creates a playable URL from the blob file.
+           setBlob(audioBlob);
            const audioUrl = URL.createObjectURL(audioBlob);
-           setAudio(audioUrl);
            setAudioChunks([]);
         };
       };
+
+      useEffect(() => {
+        console.log("REached herer");
+        if (audioBlob !== null) {
+            uploadFileToWhisper();
+        }
+      },[audioBlob])
 
     return (
         <div>
