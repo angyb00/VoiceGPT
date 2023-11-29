@@ -45,7 +45,6 @@ function App() {
 
   useEffect(() => {
     if (audioText.length !== 0) {
-      console.log("Reached here");
       uploadPromptToChat();
     }
   }, [audioText.length]);
@@ -56,7 +55,7 @@ function App() {
         <h1 className='App-header'>VoiceGPT</h1>
       </section>
       <div>
-        <AudioRecorder/>
+        <AudioRecorder audioText={audioText} onAudioTextChange={setAudioText}/>
       </div>
       <div className='upload-audio-container'>
         <input

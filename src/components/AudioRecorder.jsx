@@ -1,17 +1,16 @@
 import { useEffect } from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Button } from 'react-bootstrap';
 import './AudioRecorder.css';
 import axios from "axios";
 
 
-export default function AudioRecorder() {
+export default function AudioRecorder({audioText, promptAnswer, onAudioTextChange, onPromptAnswerChange}) {
 
     const [permission, setPermission] = useState(false);
     const [stream, setStream] = useState(null);
     const [audioChunks, setAudioChunks] = useState([]);
-    const [audio, setAudio] = useState(null);
-    const [audioBlob, setBlob] = useState(null);
+    const [audioBlob, setAudioBlob] = useState(null);
     const mediaRecorder = useRef(null);
     const [recordingStatus, setRecordingStatus] = useState("inactive");
     const mimeType = "audio/webm";
@@ -46,7 +45,7 @@ export default function AudioRecorder() {
           }
         })
         .then(value => {
-        console.log(value.data);
+            onAudioTextChange(prevArray => [...prevArray, value.data.text]);
         })
         .catch((error) => {
           alert("Error: ", error.response);
@@ -55,11 +54,8 @@ export default function AudioRecorder() {
 
     const startRecording = async () => {
         setRecordingStatus("recording");
-        //create new Media recorder instance using the stream
         const media = new MediaRecorder(stream, { type: mimeType });
-        //set the MediaRecorder instance to the mediaRecorder ref
         mediaRecorder.current = media;
-        //invokes the start method to start the recording process
         mediaRecorder.current.start();
         let localAudioChunks = [];
         mediaRecorder.current.ondataavailable = (event) => {
@@ -75,14 +71,13 @@ export default function AudioRecorder() {
         mediaRecorder.current.stop();
         mediaRecorder.current.onstop = () => {
            const audioBlob = new Blob(audioChunks, { type: mimeType });
-           setBlob(audioBlob);
+           setAudioBlob(audioBlob);
            const audioUrl = URL.createObjectURL(audioBlob);
            setAudioChunks([]);
         };
       };
 
       useEffect(() => {
-        console.log("REached herer");
         if (audioBlob !== null) {
             uploadFileToWhisper();
         }
@@ -106,14 +101,6 @@ export default function AudioRecorder() {
                     <Button onClick={stopRecording}>
                         Stop Recording
                     </Button>
-                ) }
-                { audio && (
-                    <div className="audio-container">
-                        <audio src={audio} controls></audio>
-                        <div>
-                            <a download href={audio}>Download Recording</a>
-                        </div>
-                    </div>
                 ) }
             </div>
         </div>
