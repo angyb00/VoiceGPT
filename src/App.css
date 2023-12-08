@@ -13,10 +13,10 @@
   /* bottom: 0; */
   margin-bottom: 50px;
   margin-top: 50px;
-  left: 50%;
+  /* left: 50%; */
   /* transform: translateX(-20%); */
   z-index: 1000;
-  width: 100%;
+  /* width: 100%; */
 }
 
 .upload-file-button {
