@@ -12,6 +12,7 @@ function App() {
     apiKey: process.env.REACT_APP_SECRET_KEY,
     dangerouslyAllowBrowser: true
   });
+
   const [audioFile, setAudioFile] = useState(null);
   const [audioText, setAudioText] = useState([]);
   const [promptAnswer, setPromptAnswer] = useState([]);
@@ -35,6 +36,7 @@ function App() {
     })
   };
 
+  // Once we get out AudioText, call the Prompt API to get answer
   const uploadPromptToChat = async () => {
     const completion = await openai.chat.completions.create({
       messages: [{"role": "user", "content": audioText[audioText.length - 1]}],
@@ -43,6 +45,7 @@ function App() {
     setPromptAnswer(prevArray => [...prevArray, completion.choices[0].message.content]);
   };
 
+  // Rerender once we get AudioText
   useEffect(() => {
     if (audioText.length !== 0) {
       uploadPromptToChat();
@@ -55,7 +58,7 @@ function App() {
         <h1 className='App-header'>VoiceGPT</h1>
       </section>
       <div>
-        <AudioRecorder audioText={audioText} onAudioTextChange={setAudioText}/>
+        <AudioRecorder onAudioTextChange={setAudioText}/>
       </div>
       <div className='upload-audio-container'>
         <input

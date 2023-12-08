@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 import { Button } from 'react-bootstrap';
 import './AudioRecorder.css';
 import axios from "axios";
 
 
-export default function AudioRecorder({audioText, promptAnswer, onAudioTextChange, onPromptAnswerChange}) {
+export default function AudioRecorder({onAudioTextChange}) {
 
     const [permission, setPermission] = useState(false);
     const [stream, setStream] = useState(null);
@@ -32,6 +32,7 @@ export default function AudioRecorder({audioText, promptAnswer, onAudioTextChang
         }
     };
 
+    // Whisper only takes Audio files so we need to turn audio blob to .webm file
     const uploadFileToWhisper = async () => {
         const file = new File([audioBlob], "recordedText.webm");
         const formData = new FormData();
@@ -72,11 +73,11 @@ export default function AudioRecorder({audioText, promptAnswer, onAudioTextChang
         mediaRecorder.current.onstop = () => {
            const audioBlob = new Blob(audioChunks, { type: mimeType });
            setAudioBlob(audioBlob);
-           const audioUrl = URL.createObjectURL(audioBlob);
            setAudioChunks([]);
         };
       };
 
+      // Once we get the audio blob, upload it to file
       useEffect(() => {
         if (audioBlob !== null) {
             uploadFileToWhisper();
